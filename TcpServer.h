@@ -6,17 +6,17 @@
 
 class Connection;
 
-class TcpServer : public QTcpServer
+class TcpServer : public QObject
 {
+    Q_OBJECT
 
 public:
-    TcpServer(QObject *parent = nullptr);
+    explicit TcpServer(QObject *parent = nullptr);
 
 signals:
     void newConnection(Connection *connection);
 
-protected:
-    void incomingConnection(qintptr socketDescriptor) override;
+public slots:
 
 private:
     void initServer();
