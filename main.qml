@@ -1,40 +1,46 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
-//import QtCharts 2.15
+import QtCharts 2.15
 
-Window {
-    width: 640
-    height: 480
+Item {
+    width:  Screen.width  * 0.5
+    height: Screen.height * 0.5
 
     visible: true
 
-    title: qsTr("Hello World")
+    ChartView {
+        id: chartView
 
-//    ChartView {
-//        id: chartView
+        title: "CPU Temperature"
 
-//        title: "CPU Temperature"
+        anchors.fill: parent
 
-//        anchors.fill: parent
+        legend.alignment: Qt.AlignTop
 
-//        legend.alignment: Qt.AlignTop
-//        animationOptions: ChartView.SeriesAnimations
+        // Series animation is enabled in the chart
+        animationOptions: ChartView.SeriesAnimations
 
-//        antialiasing: true
-//    }
+        antialiasing: true
 
-//    ChartView {
-//        width: 400
-//        height: 300
+        axes: [
+            AbstractAxis  { visible: true; color: "gray"; titleText: "X"; orientation: Qt.Horizontal  },
+            AbstractAxis  { visible: true; color: "gray"; titleText: "Y"; orientation: Qt.Vertical  }
+        ]
 
-//        theme: ChartView.ChartThemeBrownSand
-//        antialiasing: true
+//        createSeries(ChartView.SeriesTypeLine, speedsXml.get(currentIndex).driver);
 
-//        PieSeries {
-//            id: pieSeries
+//        axisY().min = 0;
+//        axisY().max = 250;
+//        axisY().tickCount = 6;
+//        axisY().titleText = "speed (kph)";
+//        axisX().titleText = "speed trap";
+//        axisX().labelFormat = "%.0f";
+    }
 
-//            PieSlice { label: "eaten"; value: 94.9 }
-//            PieSlice { label: "not yet eaten"; value: 5.1 }
-//        }
-//    }
 }
+
+/*##^##
+Designer {
+    D{i:0;formeditorColor:"#ffffff"}D{i:1}
+}
+##^##*/

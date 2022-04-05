@@ -2,48 +2,72 @@
 
 #include <QDebug>
 
-TcpServer::TcpServer(QObject *parent) : QObject(parent)
+TcpServer::TcpServer(TemperatureModel* temperatureModel, QObject *parent) : QObject(parent)
 {
-    //listen(QHostAddress::Any);
-
     initServer();
 
-    connect(tcpServer, &QTcpServer::newConnection, [this]
+    connect(m_tcpServer, &QTcpServer::newConnection, [this]
         {
-            QTcpSocket *tcpSocket { tcpServer->nextPendingConnection() };
+            QTcpSocket* clientSocket { m_tcpServer->nextPendingConnection() };
 
             qInfo() << "New connection received!";
 
-            connect(tcpSocket, &QIODevice::readyRead, [this, tcpSocket]
+            // readyRead signal is emitted when data has been received
+            connect(clientSocket, &QIODevice::readyRead, [this, clientSocket]
                 {
-                    QByteArray message { tcpSocket->readAll() };
+                    //QByteArray message { clientSocket->readAll() };
 
-                    qDebug() << message;
+                    QDataStream in;
+                    in.setDevice(clientSocket);
+                    // Set the protocol version of QDataStream to Version 20 (Qt 6.0)
+                    in.setVersion(QDataStream::Qt_6_2);
 
-//                    // Deserialize the data
-//                    QJsonDocument doc { QJsonDocument::fromBinaryData( message ) };
+                    in.startTransaction();
 
-//                    qInfo() << doc.toJson();
+                    QString receivedMessage;
+                    in >> receivedMessage;
 
-                    tcpSocket->disconnectFromHost();
+                    //temperatureModel->setCpuTemperature();
+
+                    qDebug() << "New message received!";
+                    qDebug() << receivedMessage;
+
+                    if ( !in.commitTransaction() )
+                        return;
+
+                    //clientSocket->disconnectFromHost();
                 }
             );
 
+            connect(clientSocket, &QAbstractSocket::errorOccurred, [this, &clientSocket] (QAbstractSocket::SocketError socketError)
+                {
+                     qDebug() << tr("The following error occurred: %1.").arg( clientSocket->errorString() );
+                }
+            );
+
+            connect(clientSocket, &QAbstractSocket::disconnected, clientSocket, &QObject::deleteLater);
         }
     );
+
 }
 
 void TcpServer::initServer()
 {
-    tcpServer = new QTcpServer(this);
+    m_tcpServer = new QTcpServer(this);
 
-    if ( !tcpServer->listen(QHostAddress::LocalHost, 5000) )
+    m_hostAddress = QHostAddress::LocalHost;
+    m_port = 5000;
+
+    if ( !m_tcpServer->listen(m_hostAddress, m_port) )
     {
-        qDebug() << tr("Unable to start the server: %1.").arg( tcpServer->errorString() );
+        qWarning() << tr("Unable to start the server: %1.").arg( m_tcpServer->errorString() );
 
-        qWarning() << "Unable to start the server: " << tcpServer->errorString();
+        m_tcpServer->close();
         return;
     }
+
+    qDebug() << tr("The server starts listen for incoming connections at %1 on port %2.").arg( m_hostAddress.toString() ).arg( QString::number(m_port) );
+
 
 //    QString ipAddress;
 //    QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
