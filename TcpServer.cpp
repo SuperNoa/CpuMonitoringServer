@@ -2,7 +2,15 @@
 
 #include <QDebug>
 
-TcpServer::TcpServer(TemperatureModel* temperatureModel, QObject *parent) : QObject(parent)
+TcpServer::TcpServer(
+        TemperatureModel* temperatureModel,
+        QString serverAddress,
+        int serverPort,
+        QObject *parent) :
+    m_temperatureModel { temperatureModel },
+    m_hostAddress { serverAddress },
+    m_port { static_cast<quint16>(serverPort) },
+    QObject(parent)
 {
     initServer();
 
@@ -15,8 +23,6 @@ TcpServer::TcpServer(TemperatureModel* temperatureModel, QObject *parent) : QObj
             // readyRead signal is emitted when data has been received
             connect(clientSocket, &QIODevice::readyRead, [this, clientSocket]
                 {
-                    //QByteArray message { clientSocket->readAll() };
-
                     QDataStream in;
                     in.setDevice(clientSocket);
                     // Set the protocol version of QDataStream to Version 20 (Qt 6.0)
@@ -24,13 +30,13 @@ TcpServer::TcpServer(TemperatureModel* temperatureModel, QObject *parent) : QObj
 
                     in.startTransaction();
 
-                    QString receivedMessage;
+                    int receivedMessage {0};
                     in >> receivedMessage;
 
-                    //temperatureModel->setCpuTemperature();
+//                    qDebug() << "New message received!";
+//                    qDebug() << receivedMessage;
 
-                    qDebug() << "New message received!";
-                    qDebug() << receivedMessage;
+                    m_temperatureModel->setCpuTemperature(receivedMessage);
 
                     if ( !in.commitTransaction() )
                         return;
@@ -41,7 +47,7 @@ TcpServer::TcpServer(TemperatureModel* temperatureModel, QObject *parent) : QObj
 
             connect(clientSocket, &QAbstractSocket::errorOccurred, [this, &clientSocket] (QAbstractSocket::SocketError socketError)
                 {
-                     qDebug() << tr("The following error occurred: %1.").arg( clientSocket->errorString() );
+                     //qDebug() << tr("The following error occurred: %1.").arg( clientSocket->errorString() );
                 }
             );
 
@@ -55,8 +61,8 @@ void TcpServer::initServer()
 {
     m_tcpServer = new QTcpServer(this);
 
-    m_hostAddress = QHostAddress::LocalHost;
-    m_port = 5000;
+//    m_hostAddress = QHostAddress::LocalHost;
+//    m_port = 5000;
 
     if ( !m_tcpServer->listen(m_hostAddress, m_port) )
     {

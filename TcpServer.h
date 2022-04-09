@@ -13,7 +13,11 @@ class TcpServer : public QObject
     Q_OBJECT
 
 public:
-    explicit TcpServer(TemperatureModel* temperatureModel, QObject *parent = nullptr);
+    explicit TcpServer(
+            TemperatureModel* temperatureModel,
+            QString serverAddress = "",
+             int serverPort = 0,
+            QObject *parent = nullptr);
 
 signals:
     void newConnection(Connection *connection);
@@ -27,6 +31,8 @@ private:
 
     QHostAddress    m_hostAddress;
     quint16         m_port { 0 };
+
+    TemperatureModel* m_temperatureModel;
 };
 
 #endif // TCPSERVER_H

@@ -6,12 +6,12 @@ TemperatureModel::TemperatureModel(QObject *parent)
 
 }
 
-double TemperatureModel::cpuTemperature() const
+int TemperatureModel::cpuTemperature() const
 {
     return m_cpuTemperature;
 }
 
-void TemperatureModel::setCpuTemperature(const double cpuTemperature)
+void TemperatureModel::setCpuTemperature(const int cpuTemperature)
 {
     if( m_cpuTemperature != cpuTemperature )
     {

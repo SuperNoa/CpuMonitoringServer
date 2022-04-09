@@ -7,19 +7,19 @@ class TemperatureModel : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(double cpuTemperature READ cpuTemperature NOTIFY cpuTemperatureChanged)
+    Q_PROPERTY(int cpuTemperature READ cpuTemperature NOTIFY cpuTemperatureChanged)
 
 public:
     explicit TemperatureModel(QObject *parent = nullptr);
 
-    double cpuTemperature() const;
-    void setCpuTemperature(const double cpuTemperature);
+    int cpuTemperature() const;
+    void setCpuTemperature(const int cpuTemperature);
 
 signals:
-    void cpuTemperatureChanged(double);
+    void cpuTemperatureChanged(int newCpuTemperatureChanged);
 
 private:
-    double m_cpuTemperature { 0 };
+    int m_cpuTemperature { 0 };
 
 };
 
