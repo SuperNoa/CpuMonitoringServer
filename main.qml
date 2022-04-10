@@ -100,7 +100,7 @@ Item {
     ChartView {
         id: chartView
 
-        title: "CPU Temperature"
+        title: "CPU Load"
 
 //        onSeriesRemoved: {
 

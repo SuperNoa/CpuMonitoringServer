@@ -41,11 +41,18 @@ int main(int argc, char *argv[])
     bool serverAddressSet   = parser.isSet(serverAddressOption);
     bool serverPortSet      = parser.isSet(serverPortOption);
 
-    QString serverAddress   { "127.0.0.1" };
-    int serverPort          { 5000 };
+    QString serverAddress   { parser.value(serverAddressOption) };
+    int serverPort          { parser.value(serverPortOption).toInt() };
 
-    serverAddress   = parser.value(serverAddressOption);
-    serverPort          = parser.value(serverPortOption).toInt();
+    if( !serverAddressSet )
+    {
+        serverAddress = "127.0.0.1";
+    }
+
+    if( !serverPortSet )
+    {
+        serverPort =5000;
+    }
 
     qDebug() << ( serverAddressSet ?
                       QString("The server will listen at the address ").append(serverAddress) :
